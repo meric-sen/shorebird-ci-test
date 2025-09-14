@@ -1,10 +1,13 @@
-name: Shorebird Workflow Example
+name: Shorebird Release
 
 on:
   workflow_dispatch:
 
+env:
+  SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+
 jobs:
-  example:
+  release:
     defaults:
       run:
         shell: bash
@@ -12,12 +15,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Use the setup-shorebird action to configure Shorebird
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v3
+
       - name: 🐦 Setup Shorebird
         uses: shorebirdtech/setup-shorebird@v1
         with:
-          cache: true # Optionally cache your Shorebird installation
+          cache: true
 
-      # Now we're able to use Shorebird CLI in our workflow
-      - name: 🚀 Use Shorebird
-        run: shorebird --version
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🚀 Shorebird Release
+        uses: shorebirdtech/shorebird-release@v0
+        with:
+          platform: android # or 'ios'
